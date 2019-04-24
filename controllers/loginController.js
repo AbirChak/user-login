@@ -11,7 +11,7 @@ const login = (req,res) => {
     const reqData = req.body.params,
           username = reqData.username,
           password = reqData.password,
-            
+          version  = req.body.version,  
           validateRequest = (callback) => {
               if(typeof username !== 'string' || username === '') {
                   callback('Invalid username!',null);
