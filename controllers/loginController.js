@@ -4,14 +4,16 @@ const sha256 = require('sha256'),
         async = require('async');
     //   loginModel = require('../models/loginModels');
 
-const login = (req,res) => {
-    const reqData = req.body.params,
-          version = req.body.version,
-          userName = reqData.username,
-          password = reqData.password,
 
+    
+const login = (req,res) => {
+
+    const reqData = req.body.params,
+          username = reqData.username,
+          password = reqData.password,
+            
           validateRequest = (callback) => {
-              if(typeof userName !== 'string' || userName === '') {
+              if(typeof username !== 'string' || username === '') {
                   callback('Invalid username!',null);
               } else if(typeof password !== "string" || password === '') {
                   callback('Invalid password!',null);
@@ -19,10 +21,38 @@ const login = (req,res) => {
                   callback(null);
               }       
           },
-
+        
+             
           authenticateUser = (callback) => {
               const encryptedPassword = sha256(password);
-              loginModel.checkLogin(userName,encryptedPassword,callback);
+              (err,db)=>{
+
+                db.collection('userlist').find({name :username}),(err,result)=>{
+
+                    if (err)throw err;
+
+                    
+                    if (!null){
+
+                        if (result.password === encryptedPassword ) {
+                        return result = true;
+                    }
+                    else return result = false;
+                }
+
+                else{
+
+                    console.log(" user does not exist")
+                }
+
+                    db.close();
+                    
+
+
+
+                }
+                
+              }
           };
 
           async.waterfall([
