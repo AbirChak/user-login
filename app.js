@@ -9,12 +9,16 @@ const express = require('express'),
       bodyParser = require('body-parser'),
       mongoose = require('mongoose'),
       dbConfig = require('./connection.js'),
+      cors = require('cors'),
       app = express();
       
 
 // Seting up body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
+
+//Enabling cors
+app.use(cors())
 
 mongoose.Promise = global.Promise;
 
