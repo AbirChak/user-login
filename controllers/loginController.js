@@ -1,8 +1,8 @@
 'use strict';
 
 const sha256 = require('sha256'),
-        async = require('async');
-    //   loginModel = require('../models/loginModels');
+        async = require('async'),
+        loginModel = require('../models/loginModel');
 
 
     
@@ -25,34 +25,7 @@ const login = (req,res) => {
              
           authenticateUser = (callback) => {
               const encryptedPassword = sha256(password);
-              (err,db)=>{
-
-                db.collection('userlist').find({name :username}),(err,result)=>{
-
-                    if (err)throw err;
-
-                    
-                    if (!null){
-
-                        if (result.password === encryptedPassword ) {
-                        return result = true;
-                    }
-                    else return result = false;
-                }
-
-                else{
-
-                    console.log(" user does not exist")
-                }
-
-                    db.close();
-                    
-
-
-
-                }
-                
-              }
+              loginModel.authenticateUSer(username,encryptedPassword,callback);    
           };
 
           async.waterfall([
@@ -67,16 +40,9 @@ const login = (req,res) => {
                       message : "Internal server error"
                   })
               } else {
-                  if(result !== true) {
-                      res.json({
-                      status : false,
-                      statusCode : 401,
-                      version : version,
-                      message : "Username/Password is not correct!"
-                      })
-                  } else {
+                  if(result !== false) {
                       let currentDate = new Date(),
-                          encryptedData = sha256(userName+''+password),
+                          encryptedData = sha256(username,''+password,'',res),
                           authToken = sha256(encryptedData+''+currentDate);
                       res.json({
                         status : true,
@@ -84,6 +50,13 @@ const login = (req,res) => {
                         version : version,
                         message : "Successfully logged in",
                         authToken : authToken
+                      });
+                  } else {
+                      res.json({
+                      status : false,
+                      statusCode : 401,
+                      version : version,
+                      message : "Username/Password is not correct!"
                       })
                   }
               }
